@@ -12,7 +12,7 @@ Project Name: **Taichi-Q**
 
 ### Inspire
 
-Honestly speaking, I'm an undergraduate student majoring in BME/EE instead of Physics or CS, so I'm not actually expertise with Quantum Computation. I've attempted some Quantum related Competitions and Hackathons during my college life and tried several opensource framework for quantum computation, then I realized it's not that complicated to design a better framework on my own. On the other hand, I noticed that Taichi provided an elegant approach for code acceleration and useful sparse matrix supports, which is helpful for high-performance system design. So here comes the interesting project.
+Honestly speaking, I'm an undergraduate student majoring in BME/EE instead of Physics or CS, so I'm not actually expertise in Quantum Computation. I've attempted some Quantum related Competitions and Hackathons during my college life and tried several opensource framework for quantum computation, then I realized it's not that complicated to design a better framework on my own. On the other hand, I noticed that Taichi provided an elegant approach for code acceleration and useful sparse matrix supports, which is helpful for high-performance system design. So here comes the interesting project.
 
 ### Goals
 
@@ -21,4 +21,4 @@ Honestly speaking, I'm an undergraduate student majoring in BME/EE instead of Ph
   - *Optional: Quantum Gate Optimization*
 - Quantum Simulation Engine
 - Quantum Circuit Visualization
-- Implement of some Quantum Algorithm (Shor, Grover, etc.)
+- Implement some Quantum Algorithms (Shor, Grover, etc.)
