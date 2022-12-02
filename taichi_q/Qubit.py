@@ -46,7 +46,7 @@ class Qubits:
             mat[ctl_num+i, ctl_num+j] = mat_ops[i, j]
 
     def Ops(self, ops, target, control):
-        tgt = np.hstack([target, control])
+        tgt = np.hstack([control, target])
         mat = ti.Vector.field(2, ti.f64, [2**len(tgt), 2**len(tgt)])
         self.mat_gen(mat, ops.matrix, mat.shape[0]-ops.matrix.shape[0])
         self.len_in = len(tgt)
@@ -70,7 +70,6 @@ class Qubits:
         for I_ex in ti.grouped(ti.ndrange(*[2]*self.len_ex)):
             idx_i = 0
             for I_in in ti.grouped(ti.ndrange(*[2]*self.len_in)):
-                # TODO: FIX IDX SORT BUGS
                 idx = ti.Vector(self.zeros_vec)
                 for i in ti.ndrange(self.len_ex):
                     idx[i] = I_ex[i]
@@ -117,8 +116,6 @@ class Qubits:
             for t in target:
                 trans_Mat[target[t], in_offset] = 1
                 in_offset += 1
-            # TODO: FIX IDX SORT BUGS
-            print(idx)
             idx = trans_Mat@idx
             # print(idx_i, idx, self.states[idx])
             self.qubit_ops[idx_i] = idx
@@ -129,7 +126,7 @@ class Qubits:
 
         for i in range(mat.shape[0]):
             print(self.qubit_ops[i])
-            # print(self.states[self.qubit_ops[i]], self.state_ops[i])
+            print(self.states[self.qubit_ops[i]], self.state_ops[i])
 
     @ti.func
     def cmat(self, mat):
