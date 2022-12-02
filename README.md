@@ -16,12 +16,10 @@ Honestly speaking, I'm an undergraduate student majoring in BME/EE instead of Ph
 
 ### Goals
 
-- [ ] Qubit, Quantum Gates and Measures Tools
+- [x] Qubit, Quantum Gates and Measures Tools
   - [x] Qubit
   - [x] Gates
-  - [ ] Measure
-- [ ] Quantum Compiler
-  - [ ] *Optional: Quantum Gate Optimization*
+  - [x] Measure
 - [ ] Quantum Simulation Engine
-- [ ] Quantum Circuit Visualization
+- [ ] Quantum Circuit and Result Visualization
 - [ ] Implement some Quantum Algorithms (Shor, Grover, etc.)

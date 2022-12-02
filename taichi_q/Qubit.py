@@ -2,6 +2,8 @@ import numpy as np
 import taichi as ti
 import taichi.math as tm
 
+from taichi_q import Gate
+
 
 @ti.data_oriented
 class Qubits:
@@ -15,6 +17,7 @@ class Qubits:
 
         # Qubit States
         self.states = ti.Vector.field(2, ti.f64, [2] * self.num_qubits)
+        self.measured = np.zeros(self.num_qubits, dtype=bool)
         self.device = device
 
         # Assign Qubit States
@@ -52,7 +55,8 @@ class Qubits:
         self.mat_gen(mat, ops.matrix, mat.shape[0]-ops.matrix.shape[0])
         self.len_in = len(tgt)
         self.len_ex = self.num_qubits-self.len_in
-        print('in', self.len_in, 'ex', self.len_ex)
+        # print('in', self.len_in, 'ex', self.len_ex)
+        print('OPS:', ops.name, '\tTgt:', target, '\tCtl', control)
 
         self.qubit_ops = ti.Vector.field(
             self.num_qubits, int, 2**self.len_in)
@@ -100,18 +104,18 @@ class Qubits:
                 for i in ti.static(range(self.len_in)):
                     idx_i += idx[i+self.len_ex]*2**(self.len_in-1-i)
 
-                print(ti.global_thread_idx(), trans_Mat, idx)
+                # print(ti.global_thread_idx(), trans_Mat, idx)
                 idx = trans_Mat@idx
 
-                print(ti.global_thread_idx(), idx_i, idx, self.states[idx])
+                # print(ti.global_thread_idx(), idx_i, idx, self.states[idx])
                 self.qubit_ops[idx_i] = idx
                 self.state_ops[idx_i] = self.states[idx]
 
             # self.cmat(mat)
             nozero_flag = 0
             for i in range(2**self.len_in):
-                print(ti.global_thread_idx(),
-                      self.qubit_ops[i], self.state_ops[i])
+                # print(ti.global_thread_idx(),
+                #       self.qubit_ops[i], self.state_ops[i])
                 if any(self.state_ops[i] != 0):
                     nozero_flag = 1
                     # break
@@ -147,13 +151,25 @@ class Qubits:
 
         self.cmat(mat)
 
+    def Measure(self, target: int):
+        self.measured[target] = True
+        p = self.Prob_estimate(target)
+        M = Gate.Measure(p[0], p[1])
+        self.Ops(M, np.asarray(target, dtype=int), np.array([], dtype=int))
+        return M.result
+
+    @ti.kernel
+    def Prob_estimate(self, target: ti.int32) -> tm.vec2:
+        p = tm.vec2([0, 0])
+        for I in ti.grouped(self.states):
+            p[I[target]] += self.cabs(self.states[I])
+        return p
+
     @ti.kernel
     def cheat(self):
-        sum = 0.0
         for I in ti.grouped(self.states):
-            print(I, self.states[I], self.cabs(self.states[I]))
-            sum += self.cabs(self.states[I])
-        print('SUM:', sum)
+            print('Q:', I, '\tState:',
+                  self.states[I], '\tP:', self.cabs(self.states[I]))
 
     @staticmethod
     @ti.func
