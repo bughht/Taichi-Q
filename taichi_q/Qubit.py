@@ -67,55 +67,65 @@ class Qubits:
             self,
             mat: ti.template(),
             target: ti.types.ndarray()):
+        trans_Mat = ti.Matrix(self.zeros_mat)
+        ti.loop_config(serialize=True)
+        for t in target:
+            trans_Mat[target[t], self.len_ex+t] = 1
+        ex_offset = 0
+        ti.loop_config(serialize=False)
+        for i in range(self.len_ex):
+            flag = -1
+            while flag != 0:
+                flag = 0
+                for j in range(self.num_qubits):
+                    flag += trans_Mat[i+ex_offset, j]
+                if flag != 0:
+                    ex_offset += 1
+            trans_Mat[i+ex_offset, i] = 1
+        ti.loop_config(serialize=False)
         for I_ex in ti.grouped(ti.ndrange(*[2]*self.len_ex)):
-            idx_i = 0
+            ti.loop_config(serialize=True)
             for I_in in ti.grouped(ti.ndrange(*[2]*self.len_in)):
+                idx_i = 0
                 idx = ti.Vector(self.zeros_vec)
+
                 for i in ti.ndrange(self.len_ex):
                     idx[i] = I_ex[i]
                 for i in ti.ndrange(self.len_in):
                     idx[self.len_ex+i] = I_in[i]
-                trans_Mat = ti.Matrix(self.zeros_mat)
-                in_offset = 0
-                for t in target:
-                    trans_Mat[target[t], self.len_ex+in_offset] = 1
-                    in_offset += 1
-                ex_offset = 0
-                for i in range(self.len_ex):
-                    flag = -1
-                    while flag != 0:
-                        flag = 0
-                        for j in range(self.num_qubits):
-                            flag += trans_Mat[i+ex_offset, j]
-                        if flag != 0:
-                            ex_offset += 1
-                    trans_Mat[i+ex_offset, i] = 1
-                    # print(flag, ex_offset, trans_Mat)
+                for i in ti.static(range(self.len_in)):
+                    idx_i += idx[i+self.len_ex]*2**(self.len_in-1-i)
+
+                # print(flag, ex_offset, trans_Mat)
                 idx = trans_Mat@idx
+
                 # print(idx_i, idx, self.states[idx])
                 self.qubit_ops[idx_i] = idx
                 self.state_ops[idx_i] = self.states[idx]
-                idx_i += 1
 
             self.cmat(mat)
 
-            for i in range(mat.shape[0]):
-                print(self.qubit_ops[i])
-                print(self.states[self.qubit_ops[i]], self.state_ops[i])
+        for I in ti.grouped(self.states):
+            print(I, self.states[I])
 
     @ti.kernel
     def Ops_kernel_full(
             self,
             mat: ti.template(),
             target: ti.types.ndarray()):
-        idx_i = 0
-        for I_in in ti.grouped(ti.ndrange(*[2]*self.len_in)):
+        trans_Mat = ti.Matrix(self.zeros_mat)
+
+        ti.loop_config(serialize=True)
+        for t in target:
+            trans_Mat[target[t], t] = 1
+
+        ti.loop_config(serialize=True)
+        for I_in in ti.grouped(self.states):
             idx = I_in
-            trans_Mat = ti.Matrix(self.zeros_mat)
-            in_offset = 0
-            for t in target:
-                trans_Mat[target[t], in_offset] = 1
-                in_offset += 1
+            idx_i = 0
+            for i in range(self.len_in):
+                idx_i += idx[i]*2**(self.len_in-1-i)
+
             idx = trans_Mat@idx
             # print(idx_i, idx, self.states[idx])
             self.qubit_ops[idx_i] = idx
@@ -124,9 +134,11 @@ class Qubits:
 
         self.cmat(mat)
 
-        for i in range(mat.shape[0]):
-            print(self.qubit_ops[i])
-            print(self.states[self.qubit_ops[i]], self.state_ops[i])
+        # for i in range(mat.shape[0]):
+        #     print(i, self.qubit_ops[i])
+        #     print(self.states[self.qubit_ops[i]], self.state_ops[i])
+        for I in ti.grouped(self.states):
+            print(I, self.states[I])
 
     @ti.func
     def cmat(self, mat):

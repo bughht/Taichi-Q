@@ -91,6 +91,11 @@ class QFT(GateBase):
         super().__init__(QFT_(n))
 
 
+class iQFT(GateBase):
+    def __init__(self, n):
+        super().__init__(iQFT_(n))
+
+
 c128 = np.complex128
 H_ = np.array([[1, 1],
                [1, -1]], dtype=c128)/sqrt(2)
@@ -122,3 +127,6 @@ def Rz_(theta): return np.array(
 
 
 def QFT_(n): return np.array(dft(2**n, 'sqrtn'), dtype=c128)
+
+
+def iQFT_(n): return np.conj(QFT_(n))
