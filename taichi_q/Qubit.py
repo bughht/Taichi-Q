@@ -1,3 +1,5 @@
+import functools
+
 import numpy as np
 import taichi as ti
 import taichi.math as tm
@@ -28,10 +30,23 @@ class Qubits:
             self.states[tuple([qubit_state_init] * self.num_qubits)] = tm.vec2(
                 1, 0)
         elif isinstance(qubit_state_init, (list, tuple, np.ndarray)):
+
             assert len(
                 qubit_state_init
             ) == self.num_qubits, "init states shape mismatch with qubit num"
-            self.states[tuple(qubit_state_init)] = tm.vec2(1, 0)
+            if isinstance(qubit_state_init[0], int):
+                self.states[tuple(qubit_state_init)] = tm.vec2(1, 0)
+            else:
+                qubit_state_init = np.asarray(qubit_state_init)
+                assert qubit_state_init.shape[0] == self.num_qubits and qubit_state_init.shape[
+                    1] == 2, "init states shape not available for qubits"
+                assert np.allclose(np.square(np.abs(qubit_state_init)).sum(
+                    axis=1), np.ones(self.num_qubits)), "init states not available for qubits (sum p = not equal 1), please check the states again"
+                entangled_state_init = functools.reduce(
+                    np.kron, qubit_state_init)
+                for i, idx in enumerate(np.ndindex(tuple([2]*self.num_qubits))):
+                    self.states[idx] = tm.vec2(
+                        [entangled_state_init[i].real, entangled_state_init[i].imag])
 
         self.measures = np.zeros(self.num_qubits, dtype=np.int8)
 

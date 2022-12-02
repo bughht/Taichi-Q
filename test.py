@@ -6,9 +6,8 @@ from taichi_q import Gate
 from taichi_q.Engine import Engine
 
 if __name__ == "__main__":
-    eng = Engine(3, 0, ti.cpu, True)
-
-    eng.Ops(Gate.U(1, 0, 2), [0])
+    eng = Engine(3, [[-1/np.sqrt(2), 1j/np.sqrt(2)],
+                 [1, 0], [1, 0]], ti.gpu, True)
     eng.qubits.cheat()
     eng.Ops(Gate.H(), [1])
     eng.qubits.cheat()
@@ -26,6 +25,7 @@ if __name__ == "__main__":
     eng.qubits.cheat()
     eng.Ops(Gate.Z(), [2], [0])
     eng.qubits.cheat()
+
     # eng.Measure(2)
     # eng.qubits.cheat()
     # eng.Ops(Gate.iQFT(4), range(4), 4)
