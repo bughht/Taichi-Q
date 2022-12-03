@@ -28,6 +28,13 @@ class GateBase:
             self,
             mat_r: ti.types.ndarray(),
             mat_i: ti.types.ndarray()):
+        """
+        Convert complex128 ndarray into f64 tm.vec2.fields
+
+        Args:
+            mat_r (ti.types.ndarray): Real part for complex matrix
+            mat_i (ti.types.ndarray): Imaginary part for complex matrix
+        """
         for i, j in self.matrix:
             self.matrix[i, j] = tm.vec2(mat_r[i, j], mat_i[i, j])
 

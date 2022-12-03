@@ -53,21 +53,40 @@ class Qubits:
         self.external_init()
 
     def external_init(self):
+        """
+        initialize matrix for ti.kernel
+        """
         self.zeros_vec = np.zeros(self.num_qubits, dtype=np.int8)
         self.zeros_mat = np.zeros(
             (self.num_qubits, self.num_qubits), dtype=np.int8)
 
     @ti.kernel
-    def mat_gen(self, mat: ti.template(), mat_ops: ti.template(), ctl_num: ti.int32):
+    def control_mat_gen(self, mat: ti.template(), mat_ops: ti.template(), ctl_num: ti.int32):
+        """
+        ti.kernel Method for Generate Controlled-Quantum Gates
+
+        Args:
+            mat (tm.vec2.field()): Complex Matrix of controlled quantum gates 
+            mat_ops (tm.vec2.field()): Complex Matrix of operated quantum gates
+            ctl_num (ti.int32): Number of control qubits
+        """
         for i in range(ctl_num):
             mat[i, i] = tm.vec2([1, 0])
         for i, j in mat_ops:
             mat[ctl_num+i, ctl_num+j] = mat_ops[i, j]
 
     def Ops(self, ops, target, control):
+        """
+        Operate quantum gate on qubits
+
+        Args:
+            ops (taichi_q.Gate.GateBase): quantum gate
+            target (list): target qubits for quantum gate operations
+            control (list, optional): qubits for controlled gate
+        """
         tgt = np.hstack([control, target])
         mat = ti.Vector.field(2, ti.f64, [2**len(tgt), 2**len(tgt)])
-        self.mat_gen(mat, ops.matrix, mat.shape[0]-ops.matrix.shape[0])
+        self.control_mat_gen(mat, ops.matrix, mat.shape[0]-ops.matrix.shape[0])
         self.len_in = len(tgt)
         self.len_ex = self.num_qubits-self.len_in
         # print('in', self.len_in, 'ex', self.len_ex)
@@ -88,6 +107,13 @@ class Qubits:
             self,
             mat: ti.template(),
             target: ti.types.ndarray()):
+        """
+        ti.kernel method for partial quantum gate operations (gatesize < num_qubits)
+
+        Args:
+            mat (tm.vec2.fields): Complex matrix of quantum gates
+            target (ti.types.ndarray): target qubits for quantum gate operations (contain original target and control)
+        """
         trans_Mat = ti.Matrix(self.zeros_mat)
         # ti.loop_config(serialize=True)
         for t in target:
@@ -126,26 +152,33 @@ class Qubits:
                 self.qubit_ops[idx_i] = idx
                 self.state_ops[idx_i] = self.states[idx]
 
-            # self.cmat(mat)
-            nozero_flag = 0
-            for i in range(2**self.len_in):
-                # print(ti.global_thread_idx(),
-                #       self.qubit_ops[i], self.state_ops[i])
-                if any(self.state_ops[i] != 0):
-                    nozero_flag = 1
-                    # break
-            if nozero_flag != 0:
-                for i in range(2**self.len_in):
-                    sum_ = tm.vec2(0, 0)
-                    for j in range(2**self.len_in):
-                        sum_ += tm.cmul(mat[i, j], self.state_ops[j])
-                    self.states[self.qubit_ops[i]] = sum_
+            self.cmat_calculate(mat)
+            # nozero_flag = 0
+            # for i in range(2**self.len_in):
+            #     # print(ti.global_thread_idx(),
+            #     #       self.qubit_ops[i], self.state_ops[i])
+            #     if any(self.state_ops[i] != 0):
+            #         nozero_flag = 1
+            #         # break
+            # if nozero_flag != 0:
+            #     for i in range(2**self.len_in):
+            #         sum_ = tm.vec2(0, 0)
+            #         for j in range(2**self.len_in):
+            #             sum_ += tm.cmul(mat[i, j], self.state_ops[j])
+            #         self.states[self.qubit_ops[i]] = sum_
 
     @ti.kernel
     def Ops_kernel_full(
             self,
             mat: ti.template(),
             target: ti.types.ndarray()):
+        """
+        ti.kernel method for full-size quantum gate operations (gatesize < num_qubits)
+
+        Args:
+            mat (tm.vec2.fields): Complex matrix of quantum gates
+            target (ti.types.ndarray): target qubits for quantum gate operations (contain original target and control)
+        """
         trans_Mat = ti.Matrix(self.zeros_mat)
 
         for t in target:
@@ -164,9 +197,18 @@ class Qubits:
             self.state_ops[idx_i] = self.states[idx]
             idx_i += 1
 
-        self.cmat(mat)
+        self.cmat_calculate(mat)
 
-    def Measure(self, target: int):
+    def Measure(self, target: int) -> int:
+        """
+        Measure the state of target qubit, project a single qubit into |0> or |1> state
+
+        Args:
+            target (int): target qubit to measure
+
+        Returns:
+            int: measurement result
+        """
         self.measured[target] = True
         p = self.Prob_estimate(target)
         M = Gate.Measure(p[0], p[1])
@@ -175,6 +217,15 @@ class Qubits:
 
     @ti.kernel
     def Prob_estimate(self, target: ti.int32) -> tm.vec2:
+        """
+        Estimate target qubit state probability
+
+        Args:
+            target (ti.int32): target qubit 
+
+        Returns:
+            tm.vec2: probability state result
+        """
         p = tm.vec2([0, 0])
         for I in ti.grouped(self.states):
             p[I[target]] += self.cabs(self.states[I])
@@ -182,6 +233,9 @@ class Qubits:
 
     @ti.kernel
     def cheat(self):
+        """
+        Cheat: View entangled qubit states and probability
+        """
         for I in ti.grouped(self.states):
             print('Q:', I, '\tState:',
                   self.states[I], '\tP:', self.cabs(self.states[I]))
@@ -189,10 +243,26 @@ class Qubits:
     @staticmethod
     @ti.func
     def cabs(c: tm.vec2) -> ti.f32:
+        """
+        Static method: calculate abs(complex)
+
+        Args:
+            c (tm.vec2): complex number saved as tm.vec2
+
+        Returns:
+            ti.f32: abs(c)
+        """
         return tm.cmul(c, tm.cconj(c))[0]
 
     @ti.func
-    def cmat(self, mat):
+    def cmat_calculate(self, mat):
+        """
+        ti.func for calculating specific quantum matrix operation 
+
+        Args:
+            mat (tm.vec2.field): quantum gate matrix
+        """
+
         nozero_flag = 0
         for i in range(2**self.len_in):
             if any(self.state_ops[i] != 0):

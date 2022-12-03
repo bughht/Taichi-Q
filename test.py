@@ -7,7 +7,7 @@ from taichi_q.Engine import Engine
 
 if __name__ == "__main__":
     eng = Engine(3, [[-1/np.sqrt(2), 1j/np.sqrt(2)],
-                 [1, 0], [1, 0]], ti.gpu, True)
+                 [1, 0], [1, 0]], ti.cpu, True)
     eng.qubits.cheat()
     eng.Ops(Gate.H(), [1])
     eng.qubits.cheat()
