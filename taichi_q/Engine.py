@@ -42,7 +42,8 @@ class Engine:
         ti.init(arch=device, default_fp=ti.f64,
                 dynamic_index=True, debug=debug)
         self.qubits_init()
-        self.gate_states_init()
+        self.max_gate = 1024
+        self.gate_states_init(self.max_gate)
 
     def qubits_init(self):
         """
@@ -57,8 +58,39 @@ class Engine:
         Args:
             max_gate (int, optional): max gate num. Defaults to 1024.
         """
-        self.gate_state = np.zeros((self.num_qubits, max_gate), dtype=str)
+        self.gate_state = np.empty((self.num_qubits, max_gate), dtype=str)
+        self.gate_state.fill(' ')
+
         self.gate_num = 0
+
+    def gate_states_append(self, ops_name, target, control=[]):
+        """
+        Update Gate Status
+
+        Args:
+            ops_name (str): operator label
+            target (list/arraylike): target qubit
+            control (list/arraylike, optional): controlled qubit. Defaults to [].
+        """
+        # offset = []
+        # for tgt in target:
+        #     history = np.where(self.gate_state[tgt] != ' ')[0]
+        #     print(history.shape)
+        #     if history.shape[0] > 0:
+        #         offset.append(self.gate_num-history.max()-1)
+        # for ctl in control:
+        #     history = np.where(self.gate_state[ctl] != ' ')[0]
+        #     if history.shape[0] > 0:
+        #         offset.append(self.gate_num-history.max()-1)
+        # if len(offset) == 0:
+        #     bk_offset = 0
+        # else:
+        #     bk_offset = min(offset)
+        for tgt in target:
+            self.gate_state[tgt, self.gate_num] = ops_name
+        for ctl in control:
+            self.gate_state[ctl, self.gate_num] = '■'
+        self.gate_num += 1
 
     def Ops(self, ops, target, control=[]):
         """
@@ -73,6 +105,7 @@ class Engine:
         assert ops.q_num == len(target), "Gate size mismatch with Qubit num"
         assert all(self.qubits.measured[target]
                    == 0), 'Target Qubit already collapsed'
+        self.gate_states_append(ops.name, target, control)
 
         self.qubits.Ops(ops,
                         target, control)
@@ -89,5 +122,6 @@ class Engine:
         """
         assert target >= 0 and target < self.num_qubits, 'Target Qubit not in range'
         assert self.qubits.measured[target] == 0, 'Target Qubit already collapsed'
+        self.gate_states_append('M', [target])
         result = self.qubits.Measure(target)
         print(result)
