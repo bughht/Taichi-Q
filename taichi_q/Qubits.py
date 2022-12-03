@@ -75,7 +75,7 @@ class Qubits:
         for i, j in mat_ops:
             mat[ctl_num+i, ctl_num+j] = mat_ops[i, j]
 
-    def Ops(self, ops, target, control):
+    def Ops(self, ops, target, control, print_output):
         """
         Operate quantum gate on qubits
 
@@ -90,7 +90,9 @@ class Qubits:
         self.len_in = len(tgt)
         self.len_ex = self.num_qubits-self.len_in
         # print('in', self.len_in, 'ex', self.len_ex)
-        print('OPS:', ops.name, '\tTgt:', target, '\tCtl', control)
+        if print_output:
+            print('OPS:{:10s}'.format(ops.name),
+                  'Tgt:', target, '\tCtl:', control)
 
         self.qubit_ops = ti.Vector.field(
             self.num_qubits, int, 2**self.len_in)
@@ -186,7 +188,7 @@ class Qubits:
 
         self.cmat_calculate(mat)
 
-    def Measure(self, target: int) -> int:
+    def Measure(self, target: int, print_output=True) -> int:
         """
         Measure the state of target qubit, project a single qubit into |0> or |1> state
 
@@ -199,7 +201,8 @@ class Qubits:
         self.measured[target] = True
         p = self.Prob_estimate(target)
         M = Gate.Measure(p[0], p[1])
-        self.Ops(M, np.asarray(target, dtype=int), np.array([], dtype=int))
+        self.Ops(M, np.asarray(target, dtype=int),
+                 np.array([], dtype=int), print_output)
         return M.result
 
     @ti.kernel

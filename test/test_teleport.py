@@ -1,14 +1,12 @@
 import numpy as np
-import taichi as ti
 
 from taichi_q import Engine, Gate
 
 if __name__ == "__main__":
     eng = Engine(
-        3,
-        [[-1/np.sqrt(5), 2j/np.sqrt(5)],
-         [1, 0], [1, 0]],
-        ti.cpu)
+        num_qubits=3,
+        state_init=[[-1/np.sqrt(5), 2j/np.sqrt(5)], [1, 0], [1, 0]],
+        device='cpu')
     eng.State_Check()
     eng.Ops(Gate.H(), [1])
     eng.circuit_print()
@@ -32,14 +30,6 @@ if __name__ == "__main__":
     eng.State_Check()
     eng.circuit_print()
     eng.Ops(Gate.Z(), [2], [0])
-    eng.State_Check()
+    eng.State_Check(plot_state=True)
     eng.circuit_print()
     eng.circuit_visualize()
-
-    # eng.Measure(2)
-    # eng.qubits.cheat()
-    # eng.Ops(Gate.QFT(2), range(2))
-    # eng.qubits.cheat()
-    # eng.Ops(Gate.iQFT(2), range(2))
-    # eng.qubits.cheat()
-    # eng.circuit_visualize()

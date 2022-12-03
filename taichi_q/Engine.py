@@ -1,3 +1,5 @@
+import time
+
 import matplotlib.pyplot as plt
 import numpy as np
 import taichi as ti
@@ -14,25 +16,26 @@ class Engine:
     def __init__(self,
                  num_qubits,
                  state_init=0,
-                 device=ti.cpu,
-                 debug=False):
+                 device='cpu'
+                 ):
         """
             Initialize Engine, define qubit num and device
 
         Args:
             num_qubits (int): Qubit Num
             state_init (int/Arraylike, optional): Initialize state of qubits. Defaults to 0.
-            device (ti.misc, optional): Device for simulator to run, support ti.cpu / gpu. Defaults to ti.cpu.
-            debug (bool, optional): Debugmode for taichi init. Defaults to False.
+            device ('str', optional): Device for simulator to run, support 'cpu' and 'gpu'. Defaults to 'cpu'.
         """
+
+        assert device in [
+            'cpu', 'gpu'], "Please Check your device. Only cpu/gpu available. Got {}".format(device)
 
         self.num_qubits = num_qubits
         self.state_init = state_init
-        self.device = device
-        self.debug = debug
+        self.device = ti.cpu if device == 'cpu' else ti.gpu
 
         ti.init(arch=device, default_fp=ti.f64,
-                dynamic_index=True, debug=debug)
+                dynamic_index=True)
         self.qubits_init()
         self.max_gate = 1024
         self.gate_states_init(self.max_gate)
@@ -116,9 +119,8 @@ class Engine:
             ((self.gate_num+3)*100, (self.num_qubits+1)*100, 3))
         gui = ti.GUI("Taichi-Q", res=((self.gate_num+3)
                      * 100, (self.num_qubits+1)*100))
-        t = 0.0
         while gui.running:
-            t += 0.2
+            t = time.time()*1.5
             self.background(t)
             gui.set_image(self.pixels)
             for qubit_line in range(self.num_qubits):
@@ -256,7 +258,7 @@ class Engine:
         self.pixels[:, :, 1].fill(0.92+0.08*np.sin(t+tm.pi*2/3))
         self.pixels[:, :, 2].fill(0.92+0.08*np.sin(t+tm.pi*4/3))
 
-    def Ops(self, ops, target, control=[]):
+    def Ops(self, ops, target, control=[], print_output=True):
         """
         Operate Quantum Gate to specific qubits
         Args:
@@ -272,9 +274,9 @@ class Engine:
         self.gate_states_append(ops.name, target, control)
 
         self.qubits.Ops(ops,
-                        target, control)
+                        target, control, print_output)
 
-    def Measure(self, target: int) -> int:
+    def Measure(self, target: int, print_output=True) -> int:
         """
         Measure the state of target qubit, project a single qubit into |0> or |1> state
 
@@ -287,7 +289,7 @@ class Engine:
         assert target >= 0 and target < self.num_qubits, 'Target Qubit not in range'
         assert self.qubits.measured[target] == 0, 'Target Qubit already collapsed'
         self.gate_states_append('M', [target])
-        result = self.qubits.Measure(target)
+        result = self.qubits.Measure(target, print_output)
         return result
 
     def State_Check(self, print_state=True, plot_state=False) -> dict:
@@ -305,7 +307,8 @@ class Engine:
         if plot_state:
             plt.figure(figsize=(10, 5))
             plt.bar(states['Q'], states['P'], color='maroon')
-            plt.xticks(rotation=25)
-            plt.ylabel('P')
+            plt.xticks(rotation=-45)
+            plt.ylabel('Probability')
+            plt.xlabel('Qubit State')
             # plt.ylim(0, 1)
             plt.show()
