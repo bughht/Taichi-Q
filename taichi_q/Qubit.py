@@ -247,7 +247,7 @@ class Qubits:
             cheat_result['P'].append(np.square(np.abs(state[0]+1j*state[1])))
             if print_state:
                 print('Q:', idx, '  State:[{:+.4f}{:+.4f}j]'.format(state[0], state[1]),
-                      '  P:{:.4f}'.format(np.abs(state[0]+1j*state[1])))
+                      '  P:{:.4f}'.format(np.square(np.abs(state[0]+1j*state[1]))))
         return cheat_result
 
     @staticmethod

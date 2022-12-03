@@ -10,7 +10,7 @@ if __name__ == "__main__":
         4,
         [[-1/np.sqrt(2), 1j/np.sqrt(2)],
          [1, 0], [1, 0], [1, 0]],
-        ti.cpu,
+        ti.gpu,
         True)
     eng.qubits.cheat()
     eng.Ops(Gate.H(), [1])
@@ -25,9 +25,7 @@ if __name__ == "__main__":
     eng.Ops(Gate.H(), [0])
     eng.circuit_print()
     eng.qubits.cheat()
-    eng.Ops(Gate.swap(), [0, 1], [2])
-    eng.qubits.cheat()
-    eng.circuit_print()
+    eng.circuit_visualize()
     eng.Measure(0)
     eng.State_Check(True, False)
     eng.circuit_print()
@@ -36,9 +34,9 @@ if __name__ == "__main__":
     eng.circuit_print()
     eng.Ops(Gate.X(), [2], [1])
     eng.qubits.cheat()
-    print(eng.gate_state[:, :9])
+    eng.circuit_print()
     eng.Ops(Gate.Z(), [2], [0])
-    print(eng.gate_state[:, :9])
+    eng.circuit_print()
     eng.circuit_visualize()
 
     # eng.Measure(2)

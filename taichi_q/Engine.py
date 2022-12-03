@@ -15,7 +15,6 @@ from taichi_q import Qubits
 # """
 
 
-@ti.data_oriented
 class Engine:
     """
     Quantum Computation Simulator Engine
@@ -107,20 +106,25 @@ class Engine:
 
     def circuit_print(self):
         for i in range(self.num_qubits):
-            print('|\'', '\' \''.join(
-                self.gate_state[i, :self.gate_num].tolist()), '\'|')
+            print('Q{} →|\'{}\'|→ Q{}'.format(
+                    i,
+                    '\' \''.join(
+                        self.gate_state[i, :self.gate_num].tolist()
+                    ),
+                    i))
 
     def circuit_visualize(self):
         """
         Visualize the Quantum Circuit
         """
         self.qubit_state_demonstrate()
-        self.pixels = ti.Vector.field(3, dtype=ti.f64, shape=(
-            (self.gate_num+3)*100, (self.num_qubits+1)*100))
-        gui = ti.GUI("Taichi-Q", res=self.pixels.shape)
+        self.pixels = np.zeros(
+            ((self.gate_num+3)*100, (self.num_qubits+1)*100, 3))
+        gui = ti.GUI("Taichi-Q", res=((self.gate_num+3)
+                     * 100, (self.num_qubits+1)*100))
         t = 0.0
         while gui.running:
-            t += 0.1
+            t += 0.2
             self.background(t)
             gui.set_image(self.pixels)
             for qubit_line in range(self.num_qubits):
@@ -236,12 +240,10 @@ class Engine:
             color=linecolor
         )
 
-    @ ti.kernel
     def background(self, t: ti.f64):
-        self.pixels.fill(tm.vec3(
-            0.92+0.08*tm.sin(t),
-            0.92+0.08*tm.sin(t+tm.pi*2/3),
-            0.92+0.08*tm.sin(t+tm.pi*4/3)))
+        self.pixels[:, :, 0].fill(0.92+0.08*np.sin(t))
+        self.pixels[:, :, 1].fill(0.92+0.08*np.sin(t+tm.pi*2/3))
+        self.pixels[:, :, 2].fill(0.92+0.08*np.sin(t+tm.pi*4/3))
 
     def Ops(self, ops, target, control=[]):
         """
