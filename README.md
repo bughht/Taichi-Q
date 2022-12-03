@@ -4,7 +4,7 @@ Quantum Computation Simulator Engine Based on Taichi (available for both GPU and
 
 **This is a Hackathon Project, Project Introduction available [here](https://bughht.github.io/University_SHU/Taichi-Q%20Introduction)**
 
-## Intallation
+## Intallation (only support windows right now)
 
 + From PyPI
 
@@ -16,19 +16,9 @@ pip install taichi-q
 pip3 install taichi-q
 ```
 
-+ Build from source
-
-```bash
-git clone https://github.com/bughht/Taichi-Q.git
-cd Taichi-Q
-pip install -r Requirements.txt
-python setup.py install
-```
-
-
 ## Usage
 
-### Include the Package
+### Import the Packages
 
 ```python
 # Required

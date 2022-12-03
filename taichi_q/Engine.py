@@ -34,7 +34,7 @@ class Engine:
         self.state_init = state_init
         self.device = ti.cpu if device == 'cpu' else ti.gpu
 
-        ti.init(arch=device, default_fp=ti.f64,
+        ti.init(arch=self.device, default_fp=ti.f64,
                 dynamic_index=True)
         self.qubits_init()
         self.max_gate = 1024

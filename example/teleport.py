@@ -7,6 +7,8 @@ if __name__ == "__main__":
         num_qubits=3,
         state_init=[[-1/np.sqrt(5), 2j/np.sqrt(5)], [1, 0], [1, 0]],
         device='cpu')
+
+    eng.State_Check(plot_state=True)
     # Step 1: A Third Party [Telamon] created an entangled qubit pair. One to Alice, another to Bob
     eng.Ops(Gate.H(), [1])
     eng.Ops(Gate.X(), [2], [1])
