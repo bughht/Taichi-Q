@@ -1,8 +1,9 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import taichi as ti
 import taichi.math as tm
 
-from taichi_q import Gate, Qubits
+from taichi_q import Qubits
 
 # """
 
@@ -141,29 +142,51 @@ class Engine:
                 gate_pos = np.where(self.gate_state[:, gate] != ' ')[0]
                 if len(gate_pos) > 1:
                     gui.line(
-                        [(gate+2.5)/(self.gate_num+3)-2.5/self.pixels.shape[0],
+                        [(gate+2.5)/(self.gate_num+3)-5/self.pixels.shape[0],
                          (gate_pos.min()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
-                        [(gate+2.5)/(self.gate_num+3)-2.5/self.pixels.shape[0],
+                        [(gate+2.5)/(self.gate_num+3)-5/self.pixels.shape[0],
                          (gate_pos.max()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
                         radius=3,
                         color=0x000000
                     )
                 for gate_idx in gate_pos:
                     pos = gate_idx
-                    if self.gate_state[pos, gate] != '■':
-                        if self.gate_state[pos, gate] == 'M':
-                            gui.line(
-                                [(gate+2.5)/(self.gate_num+3),
-                                 (pos+1)/(self.num_qubits+1.)],
-                                [(self.gate_num+2)/(self.gate_num+3), (pos+1)/(self.num_qubits+1.)], radius=6, color=0x000000)
+                    if self.gate_state[pos, gate] == '■':
+                        gui.circle(
+                            pos=[(gate+2.5)/(self.gate_num+3)-5/self.pixels.shape[0],
+                                 (pos+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
+                            color=0x000000,
+                            radius=10
+                        )
+                    elif self.gate_state[pos, gate] == 's':
+                        gui.line(
+                            [(gate+2.5)/(self.gate_num+3)-30/self.pixels.shape[0],
+                             (pos+1)/(self.num_qubits+1)+25/self.pixels.shape[1]],
+                            [(gate+2.5)/(self.gate_num+3)+20/self.pixels.shape[0],
+                             (pos+1)/(self.num_qubits+1)-25/self.pixels.shape[1]],
+                            radius=3,
+                            color=0x000000
+                        )
+                        gui.line(
+                            [(gate+2.5)/(self.gate_num+3)+20/self.pixels.shape[0],
+                             (pos+1)/(self.num_qubits+1)+25/self.pixels.shape[1]],
+                            [(gate+2.5)/(self.gate_num+3)-30/self.pixels.shape[0],
+                             (pos+1)/(self.num_qubits+1)-25/self.pixels.shape[1]],
+                            radius=3,
+                            color=0x000000
+                        )
+                    elif self.gate_state[pos, gate] == 'M':
+                        gui.line(
+                            [(gate+2.5)/(self.gate_num+3),
+                                (pos+1)/(self.num_qubits+1.)],
+                            [(self.gate_num+2)/(self.gate_num+3), (pos+1)/(self.num_qubits+1.)], radius=6, color=0x000000)
                         self.rect_colored(
                             gui,
                             topleft=[(gate+2.5)/(self.gate_num+3)-30/self.pixels.shape[0],
                                      (pos+1)/(self.num_qubits+1)+25/self.pixels.shape[1]],
                             bottomright=[(gate+2.5)/(self.gate_num+3)+20/self.pixels.shape[0],
                                          (pos+1)/(self.num_qubits+1)-25/self.pixels.shape[1]],
-                            radius=3 if self.gate_state[pos,
-                                                        gate] != 'M' else 6,
+                            radius=6,
                             linecolor=0x000000,
                             color=0xFFFFFF)
                         gui.text(
@@ -174,11 +197,21 @@ class Engine:
                             font_size=40
                         )
                     else:
-                        gui.circle(
-                            pos=[(gate+2.5)/(self.gate_num+3)-2.5/self.pixels.shape[0],
-                                 (pos+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
+                        self.rect_colored(
+                            gui,
+                            topleft=[(gate+2.5)/(self.gate_num+3)-30/self.pixels.shape[0],
+                                     (pos+1)/(self.num_qubits+1)+25/self.pixels.shape[1]],
+                            bottomright=[(gate+2.5)/(self.gate_num+3)+20/self.pixels.shape[0],
+                                         (pos+1)/(self.num_qubits+1)-25/self.pixels.shape[1]],
+                            radius=3,
+                            linecolor=0x000000,
+                            color=0xFFFFFF)
+                        gui.text(
+                            pos=[(gate+2.5)/(self.gate_num+3)-20/self.pixels.shape[0],
+                                 (pos+1)/(self.num_qubits+1)+20/self.pixels.shape[1]],
+                            content=self.gate_state[pos, gate],
                             color=0x000000,
-                            radius=10
+                            font_size=40
                         )
 
             gui.show()

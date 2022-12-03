@@ -69,30 +69,31 @@ $|0\rangle$和$|1\rangle$系数颠倒
 
 结合Bloch球，我们可以把单量子比特描述为Bloch球在3度空间中的旋转变换
 
-+ H门： $H=\frac{1}{\sqrt{2}}\begin{bmatrix}
++ H门： $H=\frac{1}{\sqrt{2}}\begin{matrix}
   1&1\\
   1&-1\\
-\end{bmatrix}$
-+ X门： $X=\begin{bmatrix}
+\end{matrix}$
++ X门： $X=\begin{matrix}
   0&1\\
   1&0\\
-\end{bmatrix}$
-+ Y门：$Y=\begin{bmatrix}
+\end{matrix}$
++ Y门：$Y=\begin{matrix}
   0&-i\\
   i&0\\
-\end{bmatrix}$
-+ Z门：$Z=\begin{bmatrix}
+\end{matrix}$
++ Z门：$Z=\begin{matrix}
   1&0\\
   0&-1\\
-\end{bmatrix}$
-+ S门：$S=\begin{bmatrix}
+\end{matrix}$
++ S门：
+$$S=\left[\begin{matrix}
   1&0\\
   0&i\\
-\end{bmatrix}$
-+ T门：$T=\begin{bmatrix}
+\end{matrix}\right]$$
++ T门：$T=\begin{matrix}
   1&0\\
   0&e^{\frac{\pi}{4}i}
-\end{bmatrix}$
+\end{matrix}$
 + $R_x(\theta)$:绕X轴转动$\theta$ $R_x(\theta)=\begin{bmatrix}
   \cos(\theta/2)&i\sin(\theta/2)\\
   -i\sin(\theta/2)&\cos(\theta/2)\\
