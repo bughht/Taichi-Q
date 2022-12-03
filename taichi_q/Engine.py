@@ -115,7 +115,7 @@ class Engine:
         t = 0.0
         while gui.running:
             t += 0.08
-            self.visualize(t)
+            self.background(t)
             gui.set_image(self.pixels)
             for qubit_line in range(self.num_qubits):
                 gui.line(
@@ -200,7 +200,7 @@ class Engine:
         )
 
     @ ti.kernel
-    def visualize(self, t: ti.f64):
+    def background(self, t: ti.f64):
         self.pixels.fill(tm.vec3(
             0.92+0.08*tm.sin(t),
             0.92+0.08*tm.sin(t+tm.pi*2/3),
