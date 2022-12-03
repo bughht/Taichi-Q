@@ -5,15 +5,6 @@ import taichi.math as tm
 
 from taichi_q import Qubits
 
-# """
-
-# Args:
-#     num_qubits (int): Qubit Num
-#     state_init (int/Arraylike, optional): Initialize state of qubits. Defaults to 0.
-#     device (_type_, optional): Device for simulator to run, support ti.cpu / gpu. Defaults to ti.cpu.
-#     debug (bool, optional): Debugmode for taichi init. Defaults to False.
-# """
-
 
 class Engine:
     """
@@ -105,17 +96,20 @@ class Engine:
                 self.state_dem = np.square(np.abs(self.state_init))
 
     def circuit_print(self):
+        """
+        Circuit visualize on terminal
+        """
         for i in range(self.num_qubits):
             print('Q{} →|\'{}\'|→ Q{}'.format(
-                    i,
-                    '\' \''.join(
-                        self.gate_state[i, :self.gate_num].tolist()
-                    ),
-                    i))
+                i,
+                '\' \''.join(
+                    self.gate_state[i, :self.gate_num].tolist()
+                ),
+                i))
 
     def circuit_visualize(self):
         """
-        Visualize the Quantum Circuit
+        Visualize the Quantum Circuit using ti.GUI
         """
         self.qubit_state_demonstrate()
         self.pixels = np.zeros(
@@ -225,6 +219,17 @@ class Engine:
             gui.show()
 
     def rect_colored(self, gui, topleft, bottomright, radius, linecolor, color):
+        """
+        Draw Rect with color inside
+
+        Args:
+            gui (ti.gui): gui backend
+            topleft (vec2): Top-left point of the rect
+            bottomright (vec2): Bottomright point of the rect
+            radius (int): Line width
+            linecolor (int): Color of the rect outer line
+            color (int): Color of the rect
+        """
         topright = [bottomright[0], topleft[1]]
         bottomleft = [topleft[0], bottomright[1]]
         gui.triangles(
@@ -241,6 +246,12 @@ class Engine:
         )
 
     def background(self, t: ti.f64):
+        """
+        Dynamic light color background
+
+        Args:
+            t (ti.f64): t increase with time, affected by fps
+        """
         self.pixels[:, :, 0].fill(0.92+0.08*np.sin(t))
         self.pixels[:, :, 1].fill(0.92+0.08*np.sin(t+tm.pi*2/3))
         self.pixels[:, :, 2].fill(0.92+0.08*np.sin(t+tm.pi*4/3))
@@ -280,6 +291,16 @@ class Engine:
         return result
 
     def State_Check(self, print_state=True, plot_state=False) -> dict:
+        """
+        Check the qubit states without measuring qubits. A trick for algorithm design, used to figure out the probability of each states
+
+        Args:
+            print_state (bool, optional): Print all qubits states. Defaults to True.
+            plot_state (bool, optional): Show Boxplot of all qubits states. Defaults to False.
+
+        Returns:
+            dict: Result of qubit states, used for data collection.
+        """
         states = self.qubits.cheat(print_state)
         if plot_state:
             plt.figure(figsize=(10, 5))

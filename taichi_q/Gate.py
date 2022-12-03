@@ -14,6 +14,16 @@ class GateBase:
     """
 
     def __init__(self, name: str, mat: np.array):
+        """
+        Initialize GateBase with gate name and its matrix
+
+        Args:
+            name (str): gate name
+            mat (np.array): gate matrix (Unitary unless measure gate)
+        """
+        if name != 'Measure':
+            assert np.allclose(np.eye(
+                mat.shape[0]), mat@np.conj(mat).T), "Please make sure the gate matrix is unitary"
         self.name = name
         self.q_num = int(np.log2(mat.shape[0]))
         self.matrix = ti.Vector.field(2, ti.f64, mat.shape)
@@ -40,71 +50,127 @@ class GateBase:
 
 
 class H(GateBase):
+    """
+    H Gate
+    """
+
     def __init__(self):
         super().__init__('H', H_)
 
 
 class X(GateBase):
+    """
+    X Gate
+    """
+
     def __init__(self):
         super().__init__('X', X_)
 
 
 class Y(GateBase):
+    """
+    Y Gate
+    """
+
     def __init__(self):
         super().__init__('Y', Y_)
 
 
 class Z(GateBase):
+    """
+    Z Gate
+    """
+
     def __init__(self):
         super().__init__('Z', Z_)
 
 
 class S(GateBase):
+    """
+    S Gate
+    """
+
     def __init__(self):
         super().__init__('S', S_)
 
 
 class T(GateBase):
+    """
+    T Gate
+    """
+
     def __init__(self):
         super().__init__('T', T_)
 
 
 class swap(GateBase):
+    """
+    swap Gate
+    """
+
     def __init__(self):
         super().__init__('swap', swap_)
 
 
 class U(GateBase):
+    """
+    U Gate
+    """
+
     def __init__(self, theta, phi, lamb):
         super().__init__('U', U_(theta, phi, lamb))
 
 
 class Rx(GateBase):
+    """
+    Rx(theta) Gate
+    """
+
     def __init__(self, theta):
         super().__init__('Rx(theta)', Rx_(theta))
 
 
 class Ry(GateBase):
+    """
+    Ry(theta) Gate
+    """
+
     def __init__(self, theta):
         super().__init__('Ry(theta)', Ry_(theta))
 
 
 class Rz(GateBase):
+    """
+    Rz(theta) Gate
+    """
+
     def __init__(self, theta):
         super().__init__('Rz(theta)', Rz_(theta))
 
 
 class QFT(GateBase):
+    """
+    QFT Gate
+    """
+
     def __init__(self, n):
         super().__init__('QFT', QFT_(n))
 
 
 class iQFT(GateBase):
+    """
+    iQFT Gate
+    """
+
     def __init__(self, n):
         super().__init__('iQFT', iQFT_(n))
 
 
 class Measure(GateBase):
+    """
+    Measure
+    """
+
     def __init__(self, p0, p1):
         sample = np.random.random()
         if sample < p0:

@@ -1,2 +1,4 @@
 *.pyc
-introduction.md
+dist
+build
+*.egg-info

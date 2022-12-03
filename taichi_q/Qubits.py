@@ -153,19 +153,6 @@ class Qubits:
                 self.state_ops[idx_i] = self.states[idx]
 
             self.cmat_calculate(mat)
-            # nozero_flag = 0
-            # for i in range(2**self.len_in):
-            #     # print(ti.global_thread_idx(),
-            #     #       self.qubit_ops[i], self.state_ops[i])
-            #     if any(self.state_ops[i] != 0):
-            #         nozero_flag = 1
-            #         # break
-            # if nozero_flag != 0:
-            #     for i in range(2**self.len_in):
-            #         sum_ = tm.vec2(0, 0)
-            #         for j in range(2**self.len_in):
-            #             sum_ += tm.cmul(mat[i, j], self.state_ops[j])
-            #         self.states[self.qubit_ops[i]] = sum_
 
     @ti.kernel
     def Ops_kernel_full(
@@ -234,7 +221,7 @@ class Qubits:
     # @ti.kernel
     def cheat(self, print_state=True) -> dict:
         """
-        Cheat: View entangled qubit states and probability
+        cheat: View entangled qubit states and probability
         """
         cheat_result = {'Q': [], 'State': [], 'P': []}
 
