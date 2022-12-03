@@ -7,9 +7,9 @@ from taichi_q.Engine import Engine
 
 if __name__ == "__main__":
     eng = Engine(
-        3,
+        4,
         [[-1/np.sqrt(2), 1j/np.sqrt(2)],
-         [1, 0], [1, 0]],
+         [1, 0], [1, 0], [1, 0]],
         ti.cpu,
         True)
     eng.qubits.cheat()
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     eng.qubits.cheat()
     print(eng.gate_state[:, :9])
     eng.Measure(0)
-    eng.qubits.cheat()
+    eng.State_Check(True, False)
     eng.Measure(1)
     eng.qubits.cheat()
     print(eng.gate_state[:, :9])
@@ -37,7 +37,6 @@ if __name__ == "__main__":
     eng.qubits.cheat()
     print(eng.gate_state[:, :9])
     eng.Ops(Gate.Z(), [2], [0])
-    eng.qubits.cheat()
     print(eng.gate_state[:, :9])
     eng.circuit_visualize()
 

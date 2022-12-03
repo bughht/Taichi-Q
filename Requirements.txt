@@ -1,0 +1,6 @@
+numpy
+taichi>=1.2.2
+functools
+matplotlib
+scipy
+math

@@ -128,14 +128,14 @@ class Engine:
                 gui.text(
                     pos=[30./self.pixels.shape[0], (qubit_line+1)/(self.num_qubits+1.) +
                          15/self.pixels.shape[1]],
-                    content="   Qubit{}".format(qubit_line),
+                    content="   Qubit{}".format(self.num_qubits-1-qubit_line),
                     color=0x000000,
                     font_size=30)
                 gui.text(
                     pos=[20./self.pixels.shape[0], (qubit_line+1)/(self.num_qubits+1.) -
                          15/self.pixels.shape[1]],
                     content="{:.1f}|0>+{:.1f}|1>".format(
-                        self.state_dem[qubit_line, 0], self.state_dem[qubit_line, 1]),
+                        self.state_dem[self.num_qubits-1-qubit_line, 0], self.state_dem[self.num_qubits-1-qubit_line, 1]),
                     color=0x000000,
                     font_size=30)
             for gate in range(self.gate_num):
@@ -143,22 +143,22 @@ class Engine:
                 if len(gate_pos) > 1:
                     gui.line(
                         [(gate+2.5)/(self.gate_num+3)-5/self.pixels.shape[0],
-                         (gate_pos.min()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
+                         (self.num_qubits-1-gate_pos.min()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
                         [(gate+2.5)/(self.gate_num+3)-5/self.pixels.shape[0],
-                         (gate_pos.max()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
+                         (self.num_qubits-1-gate_pos.max()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
                         radius=3,
                         color=0x000000
                     )
                 for gate_idx in gate_pos:
-                    pos = gate_idx
-                    if self.gate_state[pos, gate] == '■':
+                    pos = self.num_qubits-1-gate_idx
+                    if self.gate_state[gate_idx, gate] == '■':
                         gui.circle(
                             pos=[(gate+2.5)/(self.gate_num+3)-5/self.pixels.shape[0],
                                  (pos+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
                             color=0x000000,
                             radius=10
                         )
-                    elif self.gate_state[pos, gate] == 's':
+                    elif self.gate_state[gate_idx, gate] == 's':
                         gui.line(
                             [(gate+2.5)/(self.gate_num+3)-30/self.pixels.shape[0],
                              (pos+1)/(self.num_qubits+1)+25/self.pixels.shape[1]],
@@ -175,7 +175,7 @@ class Engine:
                             radius=3,
                             color=0x000000
                         )
-                    elif self.gate_state[pos, gate] == 'M':
+                    elif self.gate_state[gate_idx, gate] == 'M':
                         gui.line(
                             [(gate+2.5)/(self.gate_num+3),
                                 (pos+1)/(self.num_qubits+1.)],
@@ -192,7 +192,7 @@ class Engine:
                         gui.text(
                             pos=[(gate+2.5)/(self.gate_num+3)-20/self.pixels.shape[0],
                                  (pos+1)/(self.num_qubits+1)+20/self.pixels.shape[1]],
-                            content=self.gate_state[pos, gate],
+                            content=self.gate_state[gate_idx, gate],
                             color=0x000000,
                             font_size=40
                         )
@@ -209,11 +209,10 @@ class Engine:
                         gui.text(
                             pos=[(gate+2.5)/(self.gate_num+3)-20/self.pixels.shape[0],
                                  (pos+1)/(self.num_qubits+1)+20/self.pixels.shape[1]],
-                            content=self.gate_state[pos, gate],
+                            content=self.gate_state[gate_idx, gate],
                             color=0x000000,
                             font_size=40
                         )
-
             gui.show()
 
     def rect_colored(self, gui, topleft, bottomright, radius, linecolor, color):
@@ -273,5 +272,12 @@ class Engine:
         result = self.qubits.Measure(target)
         return result
 
-    def State_Cheat(self, plot_state):
-        self.qubits.cheat()
+    def State_Check(self, print_state=True, plot_state=False) -> dict:
+        states = self.qubits.cheat(print_state)
+        if plot_state:
+            plt.figure(figsize=(10, 5))
+            plt.bar(states['Q'], states['P'], color='maroon')
+            plt.xticks(rotation=25)
+            plt.ylabel('P')
+            # plt.ylim(0, 1)
+            plt.show()

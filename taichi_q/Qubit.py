@@ -231,14 +231,24 @@ class Qubits:
             p[I[target]] += self.cabs(self.states[I])
         return p
 
-    @ti.kernel
-    def cheat(self):
+    # @ti.kernel
+    def cheat(self, print_state=True) -> dict:
         """
         Cheat: View entangled qubit states and probability
         """
-        for I in ti.grouped(self.states):
-            print('Q:', I, '\tState:',
-                  self.states[I], '\tP:', self.cabs(self.states[I]))
+        cheat_result = {'Q': [], 'State': [], 'P': []}
+
+        for i, idx in enumerate(np.ndindex(tuple([2]*self.num_qubits))):
+            # for I in ti.grouped(self.states):
+            Q = '|'+''.join(map(str, idx))+'>'
+            state = self.states[idx]
+            cheat_result['Q'].append(Q)
+            cheat_result['State'].append(state)
+            cheat_result['P'].append(np.square(np.abs(state[0]+1j*state[1])))
+            if print_state:
+                print('Q:', idx, '  State:[{:+.4f}{:+.4f}j]'.format(state[0], state[1]),
+                      '  P:{:.4f}'.format(np.abs(state[0]+1j*state[1])))
+        return cheat_result
 
     @staticmethod
     @ti.func
