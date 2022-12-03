@@ -14,6 +14,7 @@ from taichi_q import Gate, Qubits
 # """
 
 
+@ti.data_oriented
 class Engine:
     """
     Quantum Computation Simulator Engine
@@ -29,7 +30,7 @@ class Engine:
 
         Args:
             num_qubits (int): Qubit Num
-            state_init (int/Arraylike, optional): Initialize state of qubits. Defaults to 0. 
+            state_init (int/Arraylike, optional): Initialize state of qubits. Defaults to 0.
             device (ti.misc, optional): Device for simulator to run, support ti.cpu / gpu. Defaults to ti.cpu.
             debug (bool, optional): Debugmode for taichi init. Defaults to False.
         """
@@ -72,31 +73,144 @@ class Engine:
             target (list/arraylike): target qubit
             control (list/arraylike, optional): controlled qubit. Defaults to [].
         """
-        # offset = []
-        # for tgt in target:
-        #     history = np.where(self.gate_state[tgt] != ' ')[0]
-        #     print(history.shape)
-        #     if history.shape[0] > 0:
-        #         offset.append(self.gate_num-history.max()-1)
-        # for ctl in control:
-        #     history = np.where(self.gate_state[ctl] != ' ')[0]
-        #     if history.shape[0] > 0:
-        #         offset.append(self.gate_num-history.max()-1)
-        # if len(offset) == 0:
-        #     bk_offset = 0
-        # else:
-        #     bk_offset = min(offset)
         for tgt in target:
             self.gate_state[tgt, self.gate_num] = ops_name
         for ctl in control:
             self.gate_state[ctl, self.gate_num] = '■'
         self.gate_num += 1
 
+    def qubit_state_demonstrate(self):
+        """
+        Demonstrate qubit state init
+        """
+        self.state_dem = np.zeros((self.num_qubits, 2), dtype=np.float32)
+        if isinstance(self.state_init, int):
+            assert self.state_init in [
+                0, 1
+            ], "init state out of range, demand 0 or 1"
+            self.state_dem[:, self.state_init] = 1
+        elif isinstance(self.state_init, (list, tuple, np.ndarray)):
+
+            assert len(
+                self.state_init
+            ) == self.num_qubits, "init states shape mismatch with qubit num"
+            if isinstance(self.state_init[0], int):
+                self.state_dem[:, self.state_init] = 1
+            else:
+                self.state_init = np.asarray(self.state_init)
+                assert self.state_init.shape[0] == self.num_qubits and self.state_init.shape[
+                    1] == 2, "init states shape not available for qubits"
+                assert np.allclose(np.square(np.abs(self.state_init)).sum(
+                    axis=1), np.ones(self.num_qubits)), "init states not available for qubits (sum p = not equal 1), please check the states again"
+                self.state_dem = np.square(np.abs(self.state_init))
+
+    def circuit_visualize(self):
+        """
+        Visualize the Quantum Circuit
+        """
+        self.qubit_state_demonstrate()
+        self.pixels = ti.Vector.field(3, dtype=ti.f64, shape=(
+            (self.gate_num+3)*100, (self.num_qubits+1)*100))
+        gui = ti.GUI("Taichi-Q", res=self.pixels.shape)
+        t = 0.0
+        while gui.running:
+            t += 0.08
+            self.visualize(t)
+            gui.set_image(self.pixels)
+            for qubit_line in range(self.num_qubits):
+                gui.line(
+                    [2./(self.gate_num+3), (qubit_line+1)/(self.num_qubits+1.)],
+                    [(self.gate_num+2)/(self.gate_num+3),
+                     (qubit_line+1)/(self.num_qubits+1.)],
+                    radius=3,
+                    color=0x000000)
+                gui.text(
+                    pos=[30./self.pixels.shape[0], (qubit_line+1)/(self.num_qubits+1.) +
+                         15/self.pixels.shape[1]],
+                    content="   Qubit{}".format(qubit_line),
+                    color=0x000000,
+                    font_size=30)
+                gui.text(
+                    pos=[20./self.pixels.shape[0], (qubit_line+1)/(self.num_qubits+1.) -
+                         15/self.pixels.shape[1]],
+                    content="{:.1f}|0>+{:.1f}|1>".format(
+                        self.state_dem[qubit_line, 0], self.state_dem[qubit_line, 1]),
+                    color=0x000000,
+                    font_size=30)
+            for gate in range(self.gate_num):
+                gate_pos = np.where(self.gate_state[:, gate] != ' ')[0]
+                if len(gate_pos) > 1:
+                    gui.line(
+                        [(gate+2.5)/(self.gate_num+3)-2.5/self.pixels.shape[0],
+                         (gate_pos.min()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
+                        [(gate+2.5)/(self.gate_num+3)-2.5/self.pixels.shape[0],
+                         (gate_pos.max()+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
+                        radius=3,
+                        color=0x000000
+                    )
+                for gate_idx in gate_pos:
+                    pos = gate_idx
+                    if self.gate_state[pos, gate] != '■':
+                        if self.gate_state[pos, gate] == 'M':
+                            gui.line(
+                                [(gate+2.5)/(self.gate_num+3),
+                                 (pos+1)/(self.num_qubits+1.)],
+                                [(self.gate_num+2)/(self.gate_num+3), (pos+1)/(self.num_qubits+1.)], radius=6, color=0x000000)
+                        self.rect_colored(
+                            gui,
+                            topleft=[(gate+2.5)/(self.gate_num+3)-30/self.pixels.shape[0],
+                                     (pos+1)/(self.num_qubits+1)+25/self.pixels.shape[1]],
+                            bottomright=[(gate+2.5)/(self.gate_num+3)+20/self.pixels.shape[0],
+                                         (pos+1)/(self.num_qubits+1)-25/self.pixels.shape[1]],
+                            radius=3 if self.gate_state[pos,
+                                                        gate] != 'M' else 6,
+                            linecolor=0x000000,
+                            color=0xFFFFFF)
+                        gui.text(
+                            pos=[(gate+2.5)/(self.gate_num+3)-20/self.pixels.shape[0],
+                                 (pos+1)/(self.num_qubits+1)+20/self.pixels.shape[1]],
+                            content=self.gate_state[pos, gate],
+                            color=0x000000,
+                            font_size=40
+                        )
+                    else:
+                        gui.circle(
+                            pos=[(gate+2.5)/(self.gate_num+3)-2.5/self.pixels.shape[0],
+                                 (pos+1)/(self.num_qubits+1)+0/self.pixels.shape[1]],
+                            color=0x000000,
+                            radius=10
+                        )
+
+            gui.show()
+
+    def rect_colored(self, gui, topleft, bottomright, radius, linecolor, color):
+        topright = [bottomright[0], topleft[1]]
+        bottomleft = [topleft[0], bottomright[1]]
+        gui.triangles(
+            a=np.array([topleft, topleft]),
+            b=np.array([topright, bottomleft]),
+            c=np.array([bottomright, bottomright]),
+            color=color
+        )
+        gui.rect(
+            topleft=topleft,
+            bottomright=bottomright,
+            radius=radius,
+            color=linecolor
+        )
+
+    @ ti.kernel
+    def visualize(self, t: ti.f64):
+        self.pixels.fill(tm.vec3(
+            0.92+0.08*tm.sin(t),
+            0.92+0.08*tm.sin(t+tm.pi*2/3),
+            0.92+0.08*tm.sin(t+tm.pi*4/3)))
+
     def Ops(self, ops, target, control=[]):
         """
         Operate Quantum Gate to specific qubits
         Args:
-            ops (taichi_q.Gate.GateBase): quantum gate 
+            ops (taichi_q.Gate.GateBase): quantum gate
             target (list): target qubits for quantum gate operations
             control (list, optional): qubits for controlled gate
         """
