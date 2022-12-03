@@ -7,10 +7,10 @@ from taichi_q.Engine import Engine
 
 if __name__ == "__main__":
     eng = Engine(
-        4,
-        [[-1/np.sqrt(2), 1j/np.sqrt(2)],
-         [1, 0], [1, 0], [1, 0]],
-        ti.gpu,
+        3,
+        [[-1/np.sqrt(5), 2j/np.sqrt(5)],
+         [1, 0], [1, 0]],
+        ti.cpu,
         True)
     eng.qubits.cheat()
     eng.Ops(Gate.H(), [1])
