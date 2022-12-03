@@ -57,6 +57,7 @@ $|\psi\rangle=\cfrac{|00\rangle+|11\rangle}{\sqrt{2}}$
 ##### 单量子比特门 single-qubit gate
 
 *可能github没法很好地渲染矩阵，如果想深入看的话推荐下载readme*
+
 对于单量子比特，如$|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$，作用X门（非门）效果如下
 
 $\begin{bmatrix}
