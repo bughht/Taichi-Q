@@ -271,4 +271,6 @@ class Engine:
         assert self.qubits.measured[target] == 0, 'Target Qubit already collapsed'
         self.gate_states_append('M', [target])
         result = self.qubits.Measure(target)
-        print(result)
+        return result
+
+    def State_Cheat(self, plot):
