@@ -273,4 +273,5 @@ class Engine:
         result = self.qubits.Measure(target)
         return result
 
-    def State_Cheat(self, plot):
+    def State_Cheat(self, plot_state):
+        self.qubits.cheat()
