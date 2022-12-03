@@ -105,6 +105,11 @@ class Engine:
                     axis=1), np.ones(self.num_qubits)), "init states not available for qubits (sum p = not equal 1), please check the states again"
                 self.state_dem = np.square(np.abs(self.state_init))
 
+    def circuit_print(self):
+        for i in range(self.num_qubits):
+            print('|\'', '\' \''.join(
+                self.gate_state[i, :self.gate_num].tolist()), '\'|')
+
     def circuit_visualize(self):
         """
         Visualize the Quantum Circuit
