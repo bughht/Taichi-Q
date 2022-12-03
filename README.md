@@ -4,15 +4,27 @@ Quantum Computation Simulator Engine Based on Taichi (available for both GPU and
 
 **This is a Hackathon Project, Project Introduction available [here](https://bughht.github.io/University_SHU/Taichi-Q%20Introduction)**
 
-## Intall
+## Intallation
+
++ From PyPI
 
 ```bash
 pip install taichi-q
 ```
 
-## Development
+```bash
+pip3 install taichi-q
+```
 
-Welcome any contribution!
++ Build from source
+
+```bash
+git clone https://github.com/bughht/Taichi-Q.git
+cd Taichi-Q
+pip install -r Requirements.txt
+python setup.py install
+```
+
 
 ## Usage
 
@@ -169,6 +181,10 @@ eng.circuit_visualize()
 + [Generate Bell-State](example/bellstate.py)
 + [Quantum Teleportation](example/teleport.py)
 + [Grover Searching Algorithm](example/grover.py)
+
+## Development
+
+Welcome any contribution!
 
 ## License
 
