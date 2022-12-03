@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import find_packages, setup
 
-with open('README.md') as f:
+with open('README.md', encoding='UTF-8') as f:
     readme = f.read()
 
 with open('LICENSE') as f:
@@ -9,10 +9,11 @@ with open('LICENSE') as f:
 
 setup(
     name='taichi_q',
-    version='0.0.8',
+    version='0.0.9',
     description='Taichi-Q: A quantum circuit simulator for both CPU and GPU',
     long_description=readme,
     long_description_content_type='text/markdown',
+    keywords="quantum computation simulator",
     author='Haotian Hong',
     author_email='bughht@outlook.com',
     install_requires=['numpy', 'taichi>=1.2.2',

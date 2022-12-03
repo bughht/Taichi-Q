@@ -20,8 +20,7 @@ Welcome any contribution!
 
 ```python
 # Required
-import taichi_q as tq
-from taichi_q import Engine,Gate
+from taichi_q import Engine, Gate
 
 # Optional
 import numpy as np
@@ -49,16 +48,16 @@ eng=Engine(num_qubits=3,state_init=0,device='gpu')
 + All $|0\rangle$ or $|1\rangle$
 
 ```python
-eng=Engine(num_qubits=3,state_init=0,device='cpu')
-eng=Engine(num_qubits=3,state_init=1,device='cpu')
+eng=Engine(num_qubits=3, state_init=0, device='cpu')
+eng=Engine(num_qubits=3, state_init=1, device='cpu')
 ```
 
 + Choose $|0\rangle$ or $|1\rangle$ of each qubit with list/tuple/ndarray
 
 ```python
-eng=Engine(num_qubits=3,state_init=[0,1,0],device='gpu')
-eng=Engine(num_qubits=3,state_init=(0,1,0),device='gpu')
-eng=Engine(num_qubits=3,state_init=np.array([0,1,0]),device='gpu')
+eng=Engine(num_qubits=3, state_init=[0,1,0], device='gpu')
+eng=Engine(num_qubits=3, state_init=(0,1,0), device='gpu')
+eng=Engine(num_qubits=3, state_init=np.array([0,1,0]), device='gpu')
 ```
 
 + Set complex qubit state with np.array(dtype=complex)
@@ -164,6 +163,12 @@ eng.circuit_visualize()
 ```
 
 ![visualize](img/taichi_q.gif)
+
+## Examples
+
++ [Generate Bell-State](example/bellstate.py)
++ [Quantum Teleportation](example/teleport.py)
++ [Grover Searching Algorithm](example/grover.py)
 
 ## License
 

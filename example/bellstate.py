@@ -12,7 +12,9 @@ if __name__ == "__main__":
     eng.Ops(Gate.H(), [0])
     eng.Ops(Gate.X(), [1], [0])
 
+    # Expect got |00> and |11>
+    eng.State_Check(plot_state=True)
+
+    # Cirucit
     eng.circuit_print()
     eng.circuit_visualize()
-
-    eng.State_Check(plot_state=True)
