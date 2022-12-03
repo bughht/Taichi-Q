@@ -62,7 +62,7 @@ $|\psi\rangle=\cfrac{|00\rangle+|11\rangle}{\sqrt{2}}$
 $\begin{bmatrix}
   0&1\\
   1&0\\
-\end{bmatrix}\begin{bmatrix}\alpha\\\beta\end{bmatrix}=\begin{bmatrix}\beta\\\alpha\end{bmatrix}$
+\end{bmatrix}\begin{bmatrix}\alpha\\ \beta\end{bmatrix}=\begin{bmatrix}\beta\\ \alpha\end{bmatrix}$
 
 $|0\rangle$和$|1\rangle$系数颠倒
 
@@ -161,13 +161,15 @@ from Qiskit
 
 from taichi-q
 
-![taichi-q](img/taichi_q.png)
+![taichi-q](img/taichi_q.gif)
 
-#### 量子算法：TODO (在写了在写了，代码要写不完辣，ruaaaa)
+#### 量子算法：(代码要写不完辣，我直接搬辣)
 
-##### Quantum Teleportation
+在开发好的量子模拟器上编写
 
-##### Grover Algorithm
+##### [Quantum Teleportation](https://qiskit.org/textbook/ch-algorithms/teleportation.html#4.-Understanding-Quantum-Teleportation-)
+
+##### [Grover Algorithm](https://qiskit.org/textbook/ch-algorithms/grover.html)
 
 ### Goals
 

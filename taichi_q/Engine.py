@@ -114,7 +114,7 @@ class Engine:
         gui = ti.GUI("Taichi-Q", res=self.pixels.shape)
         t = 0.0
         while gui.running:
-            t += 0.08
+            t += 0.1
             self.background(t)
             gui.set_image(self.pixels)
             for qubit_line in range(self.num_qubits):
