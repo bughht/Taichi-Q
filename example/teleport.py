@@ -13,16 +13,19 @@ if __name__ == "__main__":
     eng.Ops(Gate.H(), [1])
     eng.Ops(Gate.X(), [2], [1])
     eng.State_Check()
+    eng.circuit_print()
 
     # Step 2: Alice applies CNOT to q1 controlled by q0 (qubit send to Bob) and H to q0
     eng.Ops(Gate.X(), [1], [0])
     eng.Ops(Gate.H(), [0])
     eng.State_Check()
+    eng.circuit_print()
 
     # Step 3: Alice measure both q0 and q1 and send measure results to Bob
     eng.Measure(0)
     eng.Measure(1)
     eng.State_Check()
+    eng.circuit_print()
 
     # Step 4: Bob got q2 and measure result from Alice, then applied Gate.
     eng.Ops(Gate.X(), [2], [1])
