@@ -2,7 +2,7 @@
 
 Quantum Computation Simulator Engine Based on Taichi (available for both GPU and CPU)
 
-**This is a Hackathon Project, Project Introduction available [here](https://bughht.github.io/University_SHU/Taichi-Q%20Introduction)**
+**This is a Hackathon Project, Project Introduction available [here](https://bughht.github.io/university_shu/taichi-q-introduction/)**
 
 ## Intallation (only support windows right now)
 
