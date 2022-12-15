@@ -4,7 +4,7 @@
 
 Taichi-Q is an open source framework for quantum computation simulation based on Taichi that support both CPU and GPU.
 
-Taichi-Q is originally a 2nd prized [Taichi Hackathon](https://forum.taichi-lang.cn/t/topic/3647) Project, detailed introduction is available [here](https://bughht.github.io/university_shu/taichi-q-introduction/).
+Taichi-Q is originally a 2nd prized [Taichi Hackathon](https://forum.taichi-lang.cn/t/topic/3647) Project, detailed introduction (in Chinese) is available [here](https://bughht.github.io/university_shu/taichi-q-introduction/).
 
 This package is in a early release version. We're ready to update more features in the future.
 
