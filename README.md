@@ -1,19 +1,19 @@
 # Taichi-Q
 
-Quantum Computation Simulator Engine Based on Taichi (available for both GPU and CPU)
+## Introduction
 
-**This is a Hackathon Project, Project Introduction available [here](https://bughht.github.io/university_shu/taichi-q-introduction/)**
+Taichi-Q is an open source framework for quantum computation simulation based on Taichi that support both CPU and GPU.
 
-## Intallation (only support windows right now)
+Taichi-Q is originally a 2nd prized [Taichi Hackathon](https://forum.taichi-lang.cn/t/topic/3647) Project, detailed introduction is available [here](https://bughht.github.io/university_shu/taichi-q-introduction/).
+
+This package is in a early release version. We're ready to update more features in the future.
+
+## Intallation
 
 + From PyPI
 
 ```bash
 pip install taichi-q
-```
-
-```bash
-pip3 install taichi-q
 ```
 
 ## Usage
